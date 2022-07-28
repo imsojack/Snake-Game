@@ -85,7 +85,7 @@ void Input() {
     }
 }
 
-void Logic() {
+void customLogic() {
     int prevX = tailX[0];
     int prevY = tailY[0];
     int prev2X, prev2Y;
@@ -146,6 +146,67 @@ void Logic() {
     }
 }
 
+void normalLogic() {
+    int prevX = tailX[0];
+    int prevY = tailY[0];
+    int prev2X, prev2Y;
+    tailX[0] = x; //sets tail to follow the snake head
+    tailY[0] = y;
+
+    for (int i = 1; i < nTail; i++)
+    {
+        prev2X = tailX[i]; //sets current head position (will become head position - 1)
+        prev2Y = tailY[i];
+        tailX[i] = prevX; //sets current head position again
+        tailY[i] = prevY;
+        prevX = prev2X; //sets current position to the position it was last move
+        prevY = prev2Y;
+    }
+    switch (direction) //moves x and y coordinates (snake head) around based on WASD input
+    {
+    case LEFT:
+        x--;
+        break;
+    case RIGHT:
+        x++;
+        break;
+    case UP:
+        y--;
+        break;
+    case DOWN:
+        y++;
+        break;
+    default:
+        break;
+    }
+
+    //makes vertical speed manageable (for my computer)
+    if (direction == UP || direction == DOWN) {
+        Sleep(20); //can change this value based on strength of cpu
+    }
+
+    // Normal Snake Rules
+    if (x > width || x < 0 || y > height || y < 0) //ends game if snake head goes outside the map (all 4 sides)
+        gameOver = true;
+    
+
+    //Custom rules so that the snake can go through walls and come out on opposite side
+    //if (x >= width) x = 0; else if (x < 0) x = width - 1;
+    //if (y >= height) y = 0; else if (y < 0) y = height - 1;
+
+    for (int i = 0; i < nTail; i++)
+        if (tailX[i] == x && tailY[i] == y) //ends game if you hit your own tail
+            gameOver = true;
+
+    if (x == foodX && y == foodY)
+    {
+        points += 10; //10 points for every food the snake eats
+        foodX = rand() % width; //spawn new food in a new location if snake head is currently on current food
+        foodY = rand() % height;
+        nTail++; //increase tail by 1 after the snake eats
+    }
+}
+
 void gameSpeedFast() {
     if (direction == LEFT || direction == RIGHT) {
         Sleep(15);
@@ -180,63 +241,139 @@ int welcomeScreen(void) {
     int choice = 0;
 
     cout << "\n Welcome to Snake!\n\n";
-    cout << " Please select a game speed: \n";
+    cout << " Use 'W' 'A' 'S' 'D' to move around in the game!\n";
     cout << " (note that the speed of your computer will drastically impact the speed of the game)\n\n";
+    cout << " Please select a game speed: \n\n";
     cout << " 1 = slow\n";
     cout << " 2 = medium\n";
     cout << " 3 = fast\n";
     cout << " 4 = very fast\n\n";
  
-    printf(" Hit enter after you select a number...\n");
-    scanf("%d", &choice);
+    cout << " Hit enter after you select a number...\n";
+    cin >> choice;
 
     return choice;
 }
 
+int ruleChoice(void) {
+    int ruleChoice = 0;
+
+    system("cls");
+
+    cout << "\n Please select the rules of the game\n\n";
+    cout << " 1 = normal rules (you die if you hit a wall)\n";
+    cout << " 2 = custom rules (you can go through any wall and come out on the other side)\n\n";
+    cout << " Hit enter after you select a number...\n";
+    cin >> ruleChoice;
+
+    return ruleChoice;
+
+}
+
 void runApp() {
     int choice = 0;
+    int rules = 0;
     srand(time(NULL)); //allows food spawn to be random
 
     choice = welcomeScreen();
 
-    switch (choice)
+    switch (choice) 
     {
     case 1: 
-        Setup();
-        while (!gameOver) {
-            Draw();
-            Input();
-            Logic();
-            gameSpeedSlow();
+        rules = ruleChoice();
+        switch (rules)
+        {
+        case 1:
+            Setup();
+            while (!gameOver) {
+                Draw();
+                Input();
+                normalLogic();
+                gameSpeedSlow();
+            }
+            break;
+        case 2:
+            Setup();
+            while (!gameOver) {
+                Draw();
+                Input();
+                customLogic();
+                gameSpeedSlow();
+            }
+            break;
         }
         break;
-
     case 2: 
-        Setup();
-        while (!gameOver) {
-            Draw();
-            Input();
-            Logic();
-            gameSpeedMedium();
+        rules = ruleChoice();
+        switch (rules)
+        {
+        case 1:
+            Setup();
+            while (!gameOver) {
+                Draw();
+                Input();
+                normalLogic();
+                gameSpeedMedium();
+            }
+            break;
+        case 2:
+            Setup();
+            while (!gameOver) {
+                Draw();
+                Input();
+                customLogic();
+                gameSpeedMedium();
+            }
+            break;
         }
         break;
     case 3:
-        Setup();
-        while (!gameOver) {
-            Draw();
-            Input();
-            Logic();
-            gameSpeedFast();
-        }
-    case 4:
-        Setup();
-        while (!gameOver) {
-            Draw();
-            Input();
-            Logic();
+        rules = ruleChoice();
+        switch (rules)
+        {
+        case 1:
+            Setup();
+            while (!gameOver) {
+                Draw();
+                Input();
+                normalLogic();
+                gameSpeedFast();
+            }
+            break;
+        case 2:
+            Setup();
+            while (!gameOver) {
+                Draw();
+                Input();
+                customLogic();
+                gameSpeedFast();
+            }
+            break;
         }
         break;
-    default: printf("Invalid input");
+    case 4:
+        rules = ruleChoice();
+        switch (rules)
+        {
+        case 1:
+            Setup();
+            while (!gameOver) {
+                Draw();
+                Input();
+                normalLogic();
+            }
+            break;
+        case 2:
+            Setup();
+            while (!gameOver) {
+                Draw();
+                Input();
+                customLogic();
+            }
+            break;
+        }
+        break;
+    default: printf("Invalid input :(");
         break;
     }
 }
