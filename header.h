@@ -13,8 +13,11 @@ void Draw();
 //gets WASD input and sets a direction for each
 void Input();
 
+//implements tail logic, movement of snake, normal wall rules, score count, and random food generation
+void normalLogic();
+
 //implements tail logic, movement of snake, custom wall rules, score count, and random food generation
-void Logic();
+void customLogic();
 
 //slows down gameplay by a lot if implemented 
 void gameSpeedSlow();
@@ -27,6 +30,9 @@ void gameSpeedFast();
 
 //game menu that lets user pick a game speed and starts the game
 int welcomeScreen(void);
+
+//gets rule choice that user selected (normal or custom)
+int ruleChoice(void);
 
 //runs entire application
 void runApp();
